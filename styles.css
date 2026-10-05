@@ -244,7 +244,7 @@ body {
   background: var(--card-bg);
   border: 2px solid var(--border-color);
   border-radius: 16px;
-  padding: 0.35rem 1.2rem;
+  padding: 0.25rem 1rem;
   box-shadow: var(--card-shadow);
   display: flex;
   align-items: center;
@@ -272,10 +272,10 @@ body {
 .word-display {
   font-family: var(--font-body);
   font-weight: 700;
-  font-size: 2.5rem;
+  font-size: clamp(1.8rem, 4.2vh, 2.4rem);
   letter-spacing: 0.05em;
   color: var(--text-main);
-  line-height: 1.4;
+  line-height: 1.2;
 }
 
 .word-char {
@@ -529,10 +529,10 @@ body {
 .key-cap {
   background: #FFFFFF;
   border: 2px solid #CBD5E1;
-  border-bottom: 4.5px solid #94A3B8;
-  border-radius: 13px;
-  width: clamp(46px, 5.4vw, 66px);
-  height: clamp(44px, 7.2vh, 62px);
+  border-bottom: 4px solid #94A3B8;
+  border-radius: 12px;
+  width: clamp(40px, 5.2vw, 64px);
+  height: clamp(34px, 5.6vh, 52px);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -959,9 +959,101 @@ body {
 }
 
 /* ==========================================
-   8. 스마트폰 / 모바일 반응형 최적화
+   8. 스마트폰 / 모바일 반응형 최적화 (가로/세로 모드 지원)
    ========================================== */
-@media (max-width: 768px) {
+
+/* A. 아이폰/스마트폰 가로 모드 (Landscape Mode: 높이 520px 이하) */
+@media (max-height: 520px) {
+  .app-header {
+    padding: 0.15rem 0.4rem;
+    gap: 0.2rem;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+  }
+
+  .brand-title {
+    font-size: 0.95rem;
+  }
+
+  .mascot-icon {
+    width: 22px;
+    height: 22px;
+  }
+
+  .mode-tab {
+    padding: 0.15rem 0.45rem;
+    font-size: 0.78rem;
+    border-radius: 10px;
+  }
+
+  .stat-badge, .tool-btn {
+    padding: 0.12rem 0.35rem;
+    font-size: 0.75rem;
+    border-radius: 10px;
+  }
+
+  .practice-card-compact {
+    padding: 0.15rem 0.6rem;
+    border-radius: 10px;
+  }
+
+  .target-emoji {
+    font-size: 1.4rem;
+  }
+
+  .word-display {
+    font-size: clamp(1.2rem, 3.5vh, 1.6rem);
+    line-height: 1.1;
+  }
+
+  .target-text-box p.word-desc {
+    font-size: 0.75rem;
+  }
+
+  .center-finger-indicator {
+    padding: 0.1rem 0.5rem;
+    font-size: 0.78rem;
+  }
+
+  .hand-guide-side {
+    display: none !important; /* 스마트폰 가로모드에서는 자판 면적 확보를 위해 양옆 손 숨김 */
+  }
+
+  .keyboard-section {
+    padding: 0.2rem 0.3rem;
+    border-radius: 12px;
+  }
+
+  .kb-row {
+    gap: 2px;
+  }
+
+  .key-cap {
+    width: clamp(26px, 6.4vw, 44px);
+    height: clamp(28px, 9.5vh, 38px);
+    border-radius: 6px;
+    padding: 0;
+  }
+
+  .key-cap .key-hangul {
+    font-size: clamp(0.75rem, 2.8vh, 1.05rem);
+  }
+
+  .key-cap .key-eng {
+    font-size: 0.5rem;
+  }
+
+  .key-cap.space-key {
+    width: clamp(140px, 35vw, 210px);
+  }
+
+  .key-cap.shift-key, .key-cap.enter-key {
+    width: clamp(34px, 8.5vw, 52px);
+  }
+}
+
+/* B. 스마트폰 세로 모드 또는 좁은 화면 (max-width: 768px) */
+@media (max-width: 768px) and (min-height: 521px) {
   .app-header {
     padding: 0.3rem 0.5rem;
     flex-wrap: wrap;
@@ -1002,26 +1094,6 @@ body {
 
   .key-cap.shift-key, .key-cap.enter-key {
     width: clamp(36px, 11vw, 54px);
-  }
-
-  .hand-guide-side {
-    width: 32px;
-    min-width: 32px;
-  }
-
-  .target-word-display {
-    font-size: clamp(1.8rem, 6vw, 2.5rem);
-  }
-}
-
-@media (max-width: 480px) {
-  .key-cap {
-    width: clamp(22px, 7.5vw, 32px);
-    height: clamp(36px, 6vh, 46px);
-  }
-
-  .key-cap .key-hangul {
-    font-size: 0.85rem;
   }
 
   .hand-guide-side {
