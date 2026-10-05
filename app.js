@@ -38,16 +38,15 @@ class TajaApp {
   init() {
     // PWA 서비스 워커 등록
     if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js').catch(() => {});
-      });
+      navigator.serviceWorker.register('./sw.js').catch((err) => console.log('SW reg error:', err));
     }
 
     // PWA 설치 이벤트 수신
-    this.deferredPrompt = null;
+    this.deferredPrompt = window.deferredPwaPrompt || null;
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       this.deferredPrompt = e;
+      window.deferredPwaPrompt = e;
       const installBtn = document.getElementById('btnInstallApp');
       if (installBtn) installBtn.classList.add('active');
     });
@@ -247,11 +246,13 @@ class TajaApp {
     const btnInstall = document.getElementById('btnInstallApp');
     if (btnInstall) {
       btnInstall.addEventListener('click', () => {
-        if (this.deferredPrompt) {
-          this.deferredPrompt.prompt();
-          this.deferredPrompt.userChoice.then((choiceResult) => {
+        const promptEvent = this.deferredPrompt || window.deferredPwaPrompt;
+        if (promptEvent) {
+          promptEvent.prompt();
+          promptEvent.userChoice.then((choiceResult) => {
             if (choiceResult.outcome === 'accepted') {
               this.deferredPrompt = null;
+              window.deferredPwaPrompt = null;
             }
           });
         } else {

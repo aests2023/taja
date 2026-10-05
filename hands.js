@@ -1,6 +1,8 @@
 /**
  * 자판 일체형 손모양 SVG 렌더러 및 핑거 하이라이트 제어
- * - 왼손/오른손이 키보드 바로 위에 개별 수직 배치되어 키 위치를 직관적으로 지도
+ * - 왼손/오른손이 키보드 바로 옆 수직 배치되어 키 위치를 직관적으로 지도
+ * - 입력할 손가락만 선명하게 발광 강조 (비활성 손가락은 중립 은은한 색상)
+ * - 뷰포트 여백(viewBox -22) 확답으로 5손가락 마디 잘림 현상 100% 해결
  */
 
 class HandsGuideRenderer {
@@ -13,48 +15,48 @@ class HandsGuideRenderer {
     this.render();
   }
 
-  // 왼손 및 오른손 SVG 개별 렌더링
+  // 왼손 및 오른손 SVG 개별 렌더링 (viewBox 여백 넉넉히 확보로 5손가락 원형 완벽 보존)
   render() {
     if (this.leftContainer) {
       this.leftContainer.innerHTML = `
-        <svg class="hand-svg-mini" viewBox="0 0 240 210" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+        <svg class="hand-svg-mini" viewBox="0 -22 250 230" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
           <!-- 손바닥 -->
-          <path d="M 60 110 Q 50 190 120 195 Q 190 190 180 110 Q 180 85 160 85 L 80 85 Q 60 85 60 110 Z" 
-                fill="#FFF4EB" stroke="#FFD8BE" stroke-width="4"/>
+          <path d="M 65 115 Q 55 195 125 200 Q 195 195 185 115 Q 185 90 165 90 L 85 90 Q 65 90 65 115 Z" 
+                fill="#FFF8F3" stroke="#FFE0CF" stroke-width="3.5"/>
 
           <!-- 왼손 1. 새끼손가락 (L_PINKY) -->
           <g class="finger-group" id="finger-L_PINKY" data-finger="L_PINKY">
-            <rect x="25" y="70" width="26" height="65" rx="13" fill="#FF7675" stroke="#D63031" stroke-width="2.5" transform="rotate(-16 38 102)"/>
-            <circle cx="28" cy="58" r="13" fill="#FF7675"/>
-            <text x="28" y="62" text-anchor="middle" fill="#FFF" font-weight="bold" font-size="11">새끼</text>
+            <rect class="finger-body" x="25" y="70" width="26" height="65" rx="13" transform="rotate(-16 38 102)"/>
+            <circle class="finger-tip" cx="28" cy="58" r="13"/>
+            <text class="finger-label" x="28" y="62" text-anchor="middle">새끼</text>
           </g>
 
           <!-- 왼손 2. 약지손가락 (L_RING) -->
           <g class="finger-group" id="finger-L_RING" data-finger="L_RING">
-            <rect x="66" y="25" width="28" height="85" rx="14" fill="#FAB1A0" stroke="#E17055" stroke-width="2.5"/>
-            <circle cx="80" cy="14" r="14" fill="#FAB1A0"/>
-            <text x="80" y="18" text-anchor="middle" fill="#FFF" font-weight="bold" font-size="11">약지</text>
+            <rect class="finger-body" x="66" y="25" width="28" height="85" rx="14"/>
+            <circle class="finger-tip" cx="80" cy="14" r="14"/>
+            <text class="finger-label" x="80" y="18" text-anchor="middle">약지</text>
           </g>
 
           <!-- 왼손 3. 중지손가락 (L_MIDDLE) -->
           <g class="finger-group" id="finger-L_MIDDLE" data-finger="L_MIDDLE">
-            <rect x="106" y="10" width="28" height="98" rx="14" fill="#FFEAA7" stroke="#FDCB6E" stroke-width="2.5"/>
-            <circle cx="120" cy="0" r="14" fill="#FFEAA7"/>
-            <text x="120" y="4" text-anchor="middle" fill="#795548" font-weight="bold" font-size="11">중지</text>
+            <rect class="finger-body" x="106" y="10" width="28" height="98" rx="14"/>
+            <circle class="finger-tip" cx="120" cy="0" r="14"/>
+            <text class="finger-label" x="120" y="4" text-anchor="middle">중지</text>
           </g>
 
           <!-- 왼손 4. 검지손가락 (L_INDEX) -->
           <g class="finger-group" id="finger-L_INDEX" data-finger="L_INDEX">
-            <rect x="146" y="28" width="28" height="82" rx="14" fill="#55E6C1" stroke="#00B894" stroke-width="2.5"/>
-            <circle cx="160" cy="16" r="14" fill="#55E6C1"/>
-            <text x="160" y="20" text-anchor="middle" fill="#FFF" font-weight="bold" font-size="11">검지</text>
+            <rect class="finger-body" x="146" y="28" width="28" height="82" rx="14"/>
+            <circle class="finger-tip" cx="160" cy="16" r="14"/>
+            <text class="finger-label" x="160" y="20" text-anchor="middle">검지</text>
           </g>
 
           <!-- 왼손 5. 엄지손가락 (THUMB - 왼쪽) -->
           <g class="finger-group" id="finger-THUMB-L" data-finger="THUMB">
-            <rect x="170" y="105" width="28" height="60" rx="14" fill="#A29BFE" stroke="#6C5CE7" stroke-width="2.5" transform="rotate(38 184 135)"/>
-            <circle cx="218" cy="145" r="13" fill="#A29BFE"/>
-            <text x="218" y="149" text-anchor="middle" fill="#FFF" font-weight="bold" font-size="11">엄지</text>
+            <rect class="finger-body" x="170" y="105" width="28" height="60" rx="14" transform="rotate(38 184 135)"/>
+            <circle class="finger-tip" cx="218" cy="145" r="13"/>
+            <text class="finger-label" x="218" y="149" text-anchor="middle">엄지</text>
           </g>
         </svg>
       `;
@@ -62,57 +64,57 @@ class HandsGuideRenderer {
 
     if (this.rightContainer) {
       this.rightContainer.innerHTML = `
-        <svg class="hand-svg-mini" viewBox="0 0 240 210" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+        <svg class="hand-svg-mini" viewBox="0 -22 250 230" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
           <!-- 손바닥 -->
-          <path d="M 60 110 Q 50 190 120 195 Q 190 190 180 110 Q 180 85 160 85 L 80 85 Q 60 85 60 110 Z" 
-                fill="#FFF4EB" stroke="#FFD8BE" stroke-width="4"/>
+          <path d="M 65 115 Q 55 195 125 200 Q 195 195 185 115 Q 185 90 165 90 L 85 90 Q 65 90 65 115 Z" 
+                fill="#FFF8F3" stroke="#FFE0CF" stroke-width="3.5"/>
 
           <!-- 오른손 5. 엄지손가락 (THUMB - 오른쪽) -->
           <g class="finger-group" id="finger-THUMB-R" data-finger="THUMB">
-            <rect x="42" y="105" width="28" height="60" rx="14" fill="#A29BFE" stroke="#6C5CE7" stroke-width="2.5" transform="rotate(-38 56 135)"/>
-            <circle cx="22" cy="145" r="13" fill="#A29BFE"/>
-            <text x="22" y="149" text-anchor="middle" fill="#FFF" font-weight="bold" font-size="11">엄지</text>
+            <rect class="finger-body" x="42" y="105" width="28" height="60" rx="14" transform="rotate(-38 56 135)"/>
+            <circle class="finger-tip" cx="22" cy="145" r="13"/>
+            <text class="finger-label" x="22" y="149" text-anchor="middle">엄지</text>
           </g>
 
           <!-- 오른손 4. 검지손가락 (R_INDEX) -->
           <g class="finger-group" id="finger-R_INDEX" data-finger="R_INDEX">
-            <rect x="66" y="28" width="28" height="82" rx="14" fill="#74B9FF" stroke="#0984E3" stroke-width="2.5"/>
-            <circle cx="80" cy="16" r="14" fill="#74B9FF"/>
-            <text x="80" y="20" text-anchor="middle" fill="#FFF" font-weight="bold" font-size="11">검지</text>
+            <rect class="finger-body" x="66" y="28" width="28" height="82" rx="14"/>
+            <circle class="finger-tip" cx="80" cy="16" r="14"/>
+            <text class="finger-label" x="80" y="20" text-anchor="middle">검지</text>
           </g>
 
           <!-- 오른손 3. 중지손가락 (R_MIDDLE) -->
           <g class="finger-group" id="finger-R_MIDDLE" data-finger="R_MIDDLE">
-            <rect x="106" y="10" width="28" height="98" rx="14" fill="#0984E3" stroke="#2980B9" stroke-width="2.5"/>
-            <circle cx="120" cy="0" r="14" fill="#0984E3"/>
-            <text x="120" y="4" text-anchor="middle" fill="#FFF" font-weight="bold" font-size="11">중지</text>
+            <rect class="finger-body" x="106" y="10" width="28" height="98" rx="14"/>
+            <circle class="finger-tip" cx="120" cy="0" r="14"/>
+            <text class="finger-label" x="120" y="4" text-anchor="middle">중지</text>
           </g>
 
           <!-- 오른손 2. 약지손가락 (R_RING) -->
           <g class="finger-group" id="finger-R_RING" data-finger="R_RING">
-            <rect x="146" y="25" width="28" height="85" rx="14" fill="#6C5CE7" stroke="#4834D4" stroke-width="2.5"/>
-            <circle cx="160" cy="14" r="14" fill="#6C5CE7"/>
-            <text x="160" y="18" text-anchor="middle" fill="#FFF" font-weight="bold" font-size="11">약지</text>
+            <rect class="finger-body" x="146" y="25" width="28" height="85" rx="14"/>
+            <circle class="finger-tip" cx="160" cy="14" r="14"/>
+            <text class="finger-label" x="160" y="18" text-anchor="middle">약지</text>
           </g>
 
           <!-- 오른손 1. 새끼손가락 (R_PINKY) -->
           <g class="finger-group" id="finger-R_PINKY" data-finger="R_PINKY">
-            <rect x="187" y="70" width="26" height="65" rx="13" fill="#FD79A8" stroke="#E84393" stroke-width="2.5" transform="rotate(16 200 102)"/>
-            <circle cx="212" cy="58" r="13" fill="#FD79A8"/>
-            <text x="212" y="62" text-anchor="middle" fill="#FFF" font-weight="bold" font-size="11">새끼</text>
+            <rect class="finger-body" x="187" y="70" width="26" height="65" rx="13" transform="rotate(16 200 102)"/>
+            <circle class="finger-tip" cx="212" cy="58" r="13"/>
+            <text class="finger-label" x="212" y="62" text-anchor="middle">새끼</text>
           </g>
         </svg>
       `;
     }
   }
 
-  // 목표 손가락 강조 및 안내 업데이트
+  // 목표 손가락만 선명하게 하이라이트 발광
   highlightFinger(fingerInfo, targetChar = '') {
     // 이전 강조 제거
     const prevActive = document.querySelectorAll('.finger-group.active-finger');
     prevActive.forEach(el => el.classList.remove('active-finger'));
     
-    document.querySelectorAll('.hand-mini-box').forEach(card => card.classList.remove('active-hand'));
+    document.querySelectorAll('.side-hand-card').forEach(card => card.classList.remove('active-hand'));
 
     if (!fingerInfo) {
       if (this.labelContainer) {
