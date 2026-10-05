@@ -129,6 +129,12 @@ class TajaApp {
     kbContainer.querySelectorAll('.key-cap').forEach(cap => {
       cap.addEventListener('click', (e) => {
         const keyVal = e.currentTarget.dataset.key;
+
+        // 마우스/터치 클릭 시 시각적 피드백 효과
+        const capEl = e.currentTarget;
+        capEl.classList.add('pressed');
+        setTimeout(() => capEl.classList.remove('pressed'), 150);
+
         if (keyVal === 'ShiftLeft' || keyVal === 'ShiftRight') {
           this.isShiftPressed = !this.isShiftPressed;
           this.updateKeyboardShiftState();
@@ -156,6 +162,11 @@ class TajaApp {
                 inputEl.value += charToAppend;
                 inputEl.dispatchEvent(new Event('input', { bubbles: true }));
               }
+              inputEl.focus();
+            }
+          } else if (this.currentMode === 'balloon') {
+            if (this.balloonGame) {
+              this.balloonGame.handleKeyPress(actualKey);
             }
           } else {
             this.handleKeyDown({ key: actualKey, preventDefault: () => {} });
@@ -306,16 +317,29 @@ class TajaApp {
       btn.classList.toggle('active', btn.dataset.mode === mode);
     });
 
-    const practiceSec = document.getElementById('practiceSection');
+    const compactCard = document.getElementById('practiceCardCompact');
+    const longSec = document.getElementById('longSentenceSection');
     const gameSec = document.getElementById('gameSection');
+    const topContentArea = document.getElementById('topContentArea');
 
     if (mode === 'balloon') {
-      if (practiceSec) practiceSec.style.display = 'none';
+      if (compactCard) compactCard.style.display = 'none';
+      if (longSec) longSec.style.display = 'none';
       if (gameSec) gameSec.style.display = 'flex';
+      if (topContentArea) topContentArea.classList.add('game-mode');
       this.startBalloonGame();
-    } else {
-      if (practiceSec) practiceSec.style.display = 'flex';
+    } else if (mode === 'longSentence') {
+      if (compactCard) compactCard.style.display = 'none';
+      if (longSec) longSec.style.display = 'flex';
       if (gameSec) gameSec.style.display = 'none';
+      if (topContentArea) topContentArea.classList.remove('game-mode');
+      if (this.balloonGame) this.balloonGame.stop();
+      this.loadCurrentTarget();
+    } else {
+      if (compactCard) compactCard.style.display = 'flex';
+      if (longSec) longSec.style.display = 'none';
+      if (gameSec) gameSec.style.display = 'none';
+      if (topContentArea) topContentArea.classList.remove('game-mode');
       if (this.balloonGame) this.balloonGame.stop();
       this.loadCurrentTarget();
     }
@@ -326,14 +350,12 @@ class TajaApp {
     let wordText = '';
     let desc = '';
 
-    const compactCard = document.querySelector('.practice-card-compact');
-    const sideHandsUnit = document.querySelector('.keyboard-with-side-hands-unit');
+    const compactCard = document.getElementById('practiceCardCompact');
     const longSec = document.getElementById('longSentenceSection');
     const longInput = document.getElementById('longTypingInput');
 
     if (this.currentMode === 'longSentence') {
       if (compactCard) compactCard.style.display = 'none';
-      if (sideHandsUnit) sideHandsUnit.style.display = 'none';
       if (longSec) longSec.style.display = 'flex';
 
       if (longInput) {
@@ -372,13 +394,14 @@ class TajaApp {
       }
 
       this.targetText = wordText;
+      this.updateLongSentenceHighlight();
+
       if (this.speechEnabled) {
         window.soundSystem.speak(wordText);
       }
       return;
     } else {
       if (compactCard) compactCard.style.display = 'flex';
-      if (sideHandsUnit) sideHandsUnit.style.display = 'flex';
       if (longSec) longSec.style.display = 'none';
     }
 
@@ -492,6 +515,83 @@ class TajaApp {
     }
   }
 
+  updateLongSentenceHighlight() {
+    document.querySelectorAll('.key-cap.target-key').forEach(el => {
+      el.classList.remove('target-key');
+    });
+
+    if (this.currentMode !== 'longSentence') return;
+
+    const inputEl = document.getElementById('longTypingInput');
+    const typedText = inputEl ? inputEl.value : '';
+    const targetText = this.targetText || '';
+
+    let nextKey = null;
+    let charRep = '';
+
+    if (typedText.length >= targetText.length) {
+      nextKey = 'Enter';
+      charRep = 'Enter';
+    } else {
+      let idx = 0;
+      while (idx < typedText.length && idx < targetText.length && typedText[idx] === targetText[idx]) {
+        idx++;
+      }
+
+      if (idx >= targetText.length) {
+        nextKey = 'Enter';
+        charRep = 'Enter';
+      } else {
+        const targetChar = targetText[idx];
+        if (targetChar === ' ') {
+          nextKey = ' ';
+          charRep = '스페이스';
+        } else {
+          const targetJamos = window.decomposeSyllableToKeys(targetChar);
+          const typedChar = typedText[idx] || '';
+          if (!typedChar) {
+            nextKey = targetJamos[0];
+          } else {
+            const typedJamos = window.decomposeSyllableToKeys(typedChar);
+            let matchCount = 0;
+            for (let j = 0; j < typedJamos.length && j < targetJamos.length; j++) {
+              if (typedJamos[j] === targetJamos[j]) {
+                matchCount++;
+              } else {
+                break;
+              }
+            }
+            const nextJamoIdx = Math.min(matchCount, targetJamos.length - 1);
+            nextKey = targetJamos[nextJamoIdx];
+          }
+          if (nextKey) {
+            const keyInfo = window.KEYBOARD_MAP[nextKey] || window.KEYBOARD_MAP[nextKey.toLowerCase()];
+            charRep = keyInfo ? (keyInfo.hangul || keyInfo.eng.toUpperCase()) : nextKey;
+          }
+        }
+      }
+    }
+
+    if (nextKey) {
+      const keyInfo = window.KEYBOARD_MAP[nextKey] || window.KEYBOARD_MAP[nextKey.toLowerCase()];
+      if (keyInfo) {
+        const targetCapId = keyInfo.baseKey || (nextKey === 'Enter' ? 'Enter' : (nextKey === 'ShiftLeft' || nextKey === 'ShiftRight' ? nextKey : nextKey.toLowerCase()));
+        const keyCapEl = document.getElementById(`keycap-${targetCapId}`);
+        if (keyCapEl) keyCapEl.classList.add('target-key');
+
+        if (keyInfo.isShift) {
+          const shiftId = keyInfo.shiftSide === 'right' ? 'ShiftLeft' : 'ShiftRight';
+          const shiftCapEl = document.getElementById(`keycap-${shiftId}`);
+          if (shiftCapEl) shiftCapEl.classList.add('target-key');
+        }
+
+        if (this.handsRenderer) {
+          this.handsRenderer.highlightFinger(keyInfo.finger, charRep);
+        }
+      }
+    }
+  }
+
   handleLongSentenceInput(e) {
     if (this.currentMode !== 'longSentence') return;
 
@@ -532,6 +632,8 @@ class TajaApp {
       if (speedEl) speedEl.textContent = isNaN(speed) ? 0 : Math.min(speed, 999);
       if (accEl) accEl.textContent = isNaN(accuracy) ? 100 : Math.min(accuracy, 100);
     }
+
+    this.updateLongSentenceHighlight();
   }
 
   handleLongSentenceEnter() {
@@ -818,6 +920,7 @@ class BalloonGameManager {
     this.timer = setInterval(() => this.spawnBalloon(), 2500);
 
     this.spawnBalloon();
+    this.updateTargetHighlight();
   }
 
   stop() {
@@ -825,6 +928,10 @@ class BalloonGameManager {
     if (this.timer) clearInterval(this.timer);
     this.wrapper.innerHTML = '';
     this.balloons = [];
+    document.querySelectorAll('.key-cap.target-key').forEach(el => el.classList.remove('target-key'));
+    if (window.tajaApp && window.tajaApp.handsRenderer) {
+      window.tajaApp.handsRenderer.highlightFinger(null);
+    }
   }
 
   updateGameHUD() {
@@ -837,6 +944,60 @@ class BalloonGameManager {
     if (window.tajaApp) {
       window.tajaApp.score = Math.max(window.tajaApp.score, this.score);
       window.tajaApp.updateStatsUI();
+    }
+  }
+
+  updateTargetHighlight() {
+    if (!window.tajaApp || window.tajaApp.currentMode !== 'balloon') return;
+
+    document.querySelectorAll('.key-cap.target-key').forEach(el => {
+      el.classList.remove('target-key');
+    });
+
+    if (!this.isRunning || this.balloons.length === 0) {
+      if (window.tajaApp.handsRenderer) {
+        window.tajaApp.handsRenderer.highlightFinger(null);
+      }
+      return;
+    }
+
+    // 입력 중인 풍선을 최우선 강조, 없으면 가장 높이(위쪽으로) 올라온 풍선 강조
+    let activeBalloon = this.balloons.find(b => b.currentSyllableIdx > 0 || b.currentJamoProgress > 0);
+    if (!activeBalloon) {
+      activeBalloon = [...this.balloons].sort((a, b) => b.bottom - a.bottom)[0];
+    }
+
+    if (!activeBalloon) return;
+
+    let targetKey = null;
+    let charRep = '';
+
+    if (activeBalloon.currentJamoProgress < activeBalloon.currentJamoKeys.length) {
+      targetKey = activeBalloon.currentJamoKeys[activeBalloon.currentJamoProgress];
+    } else if (activeBalloon.currentSyllableIdx < activeBalloon.syllables.length) {
+      const curChar = activeBalloon.syllables[activeBalloon.currentSyllableIdx];
+      const jamos = window.decomposeSyllableToKeys(curChar);
+      if (jamos.length > 0) targetKey = jamos[0];
+    }
+
+    if (targetKey) {
+      const keyInfo = window.KEYBOARD_MAP[targetKey] || window.KEYBOARD_MAP[targetKey.toLowerCase()];
+      if (keyInfo) {
+        charRep = keyInfo.hangul || keyInfo.eng.toUpperCase();
+        const targetCapId = keyInfo.baseKey || (targetKey === 'Enter' ? 'Enter' : (targetKey === 'ShiftLeft' || targetKey === 'ShiftRight' ? targetKey : targetKey.toLowerCase()));
+        const keyCapEl = document.getElementById(`keycap-${targetCapId}`);
+        if (keyCapEl) keyCapEl.classList.add('target-key');
+
+        if (keyInfo.isShift) {
+          const shiftId = keyInfo.shiftSide === 'right' ? 'ShiftLeft' : 'ShiftRight';
+          const shiftCapEl = document.getElementById(`keycap-${shiftId}`);
+          if (shiftCapEl) shiftCapEl.classList.add('target-key');
+        }
+
+        if (window.tajaApp.handsRenderer) {
+          window.tajaApp.handsRenderer.highlightFinger(keyInfo.finger, `${activeBalloon.word} (풍선: ${charRep})`);
+        }
+      }
     }
   }
 
@@ -855,6 +1016,7 @@ class BalloonGameManager {
 
     this.balloons.push(balloonObj);
     this.animateBalloon(balloonObj);
+    this.updateTargetHighlight();
   }
 
   animateBalloon(bObj) {
@@ -867,6 +1029,7 @@ class BalloonGameManager {
       if (bObj.bottom > this.wrapper.clientHeight + 100) {
         if (bObj.el.parentNode) bObj.el.parentNode.removeChild(bObj.el);
         this.balloons = this.balloons.filter(b => b !== bObj);
+        this.updateTargetHighlight();
       } else {
         requestAnimationFrame(step);
       }
@@ -926,6 +1089,8 @@ class BalloonGameManager {
         // 단어/문장 입력 진행 중 기분 좋은 톡 효과음
         window.soundSystem.playKeyPop();
       }
+
+      this.updateTargetHighlight();
     } else {
       // 불일치 키 오답 처리
       window.soundSystem.playError();

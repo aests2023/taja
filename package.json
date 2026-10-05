@@ -1,0 +1,12 @@
+{
+  "name": "taja-app",
+  "version": "1.0.0",
+  "description": "새싹 타자 교실 - 어린이를 위한 사이드 손모양 맞춤 타자 프로그램",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx -y serve . -p 8080"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

@@ -54,11 +54,11 @@
   <!-- 2. 메인 콘텐츠 영역 (한 화면에 100% 들어오도록 피팅) -->
   <main class="main-content">
 
-    <!-- [연습 모드 전용 영역] -->
-    <div id="practiceSection" class="practice-section-allinone">
+    <!-- 상단 콘텐츠 영역 (학습 모드에 따라 카드/게임 화면 전환) -->
+    <div class="top-content-area" id="topContentArea">
 
-      <!-- A. 제시 글씨 카드 및 자유 타자 입력창 -->
-      <section class="practice-card-compact">
+      <!-- A. 자리/낱말/짧은글 제시 카드 -->
+      <section class="practice-card-compact" id="practiceCardCompact">
         <div class="target-word-wrapper">
           <span class="target-emoji" id="targetEmoji">🍎</span>
           <div class="target-text-box">
@@ -67,41 +67,13 @@
           </div>
         </div>
 
-        <!-- 다음 칠 자소 키 분해 바 (자리/낱말/짧은글 모드 전용) -->
+        <!-- 다음 칠 자소 키 분해 바 -->
         <div class="key-decomposition-bar" id="keyDecompositionBar">
           다음 누를 키: <span class="next-key-tag">ㄱ</span> (왼손 검지)
         </div>
       </section>
 
-      <!-- B. 손모양이 키보드 양옆으로 위치하는 사이드 뷰 레이아웃 유닛 -->
-      <section class="keyboard-with-side-hands-unit">
-
-        <!-- 1. 왼손 카드 (키보드 좌측) -->
-        <div class="side-hand-card left-side-hand" id="leftHandCard">
-          <span class="hand-tag">왼손 (Left)</span>
-          <div class="svg-wrap" id="leftHandSvgWrap"></div>
-        </div>
-
-        <!-- 2. 중앙 유닛: 상단 실시간 안내 가이드 + 대형 가상 키보드 -->
-        <div class="center-keyboard-block">
-          <div class="center-guide-msg" id="fingerGuideMsg">
-            <div class="finger-guide-box">
-              <span class="finger-text">키보드를 누르면 안내 손가락이 움직여요! 👆</span>
-            </div>
-          </div>
-
-          <div class="keyboard-section" id="virtualKeyboard" aria-label="타자 키보드 배치"></div>
-        </div>
-
-        <!-- 3. 오른손 카드 (키보드 우측) -->
-        <div class="side-hand-card right-side-hand" id="rightHandCard">
-          <span class="hand-tag">오른손 (Right)</span>
-          <div class="svg-wrap" id="rightHandSvgWrap"></div>
-        </div>
-
-      </section>
-
-      <!-- C. 긴 문장 모드 전용 대형 자유 타자 전용 화면 (자판/손모양 전혀 없음) -->
+      <!-- B. 긴 문장 모드 전용 대형 자유 타자 전용 화면 -->
       <section class="long-sentence-section" id="longSentenceSection" style="display: none;">
         
         <!-- 실시간 지표 헤더 (타수, 정확도, 문장 번호) -->
@@ -111,7 +83,7 @@
           <div class="stat-pill progress-pill">📜 연습 문장: <span id="longSentenceNum">1</span> / <span id="longSentenceTotal">7</span></div>
         </div>
 
-        <!-- 제시 긴 문장 카드 (대형 글씨) -->
+        <!-- 제시 긴 문장 카드 -->
         <div class="long-sentence-card">
           <span class="long-emoji" id="longTargetEmoji">🌱</span>
           <div class="long-text-wrapper">
@@ -124,34 +96,57 @@
           <input type="text" class="long-typing-input" id="longTypingInput" placeholder="위 문장을 보고 여기에 자유롭게 적어보세요... (엔터를 누르면 다음 문장)" autocomplete="off">
         </div>
 
-        <!-- 안내 문구 -->
-        <div class="long-guide-tip">
-          <span>💡 문장을 끝까지 적은 후 <strong>[Enter 키]</strong>를 누르면 다음 문장으로 넘어가요!</span>
+      </section>
+
+      <!-- C. 풍선 터뜨리기 게임 모드 영역 -->
+      <section id="gameSection" class="game-container" style="display: none;">
+        <!-- 풍선 게임 단계 선택 바 -->
+        <div class="game-level-bar" id="balloonLevelNav">
+          <span class="level-label">🎈 풍선 게임 단계:</span>
+          <button class="level-btn active" data-level="1">1단계: 자음/모음</button>
+          <button class="level-btn" data-level="2">2단계: 한 글자</button>
+          <button class="level-btn" data-level="3">3단계: 단어</button>
+          <button class="level-btn" data-level="4">4단계: 짧은 글</button>
         </div>
 
+        <div class="game-canvas-wrapper" id="gameCanvasWrapper">
+          <!-- 풍선 게임 실시간 점수 & 카운터 HUD 오버레이 -->
+          <div class="game-hud-overlay">
+            <div class="hud-item score-hud">⭐ 점수: <span id="gameScore">0</span>점</div>
+            <div class="hud-item pop-hud">🎈 터뜨린 풍선: <span id="gamePopCount">0</span>개</div>
+          </div>
+        </div>
       </section>
 
     </div>
 
-    <!-- [풍선 터뜨리기 게임 모드 영역] -->
-    <div id="gameSection" class="game-container">
-      <!-- 풍선 게임 단계 선택 바 -->
-      <div class="game-level-bar" id="balloonLevelNav">
-        <span class="level-label">🎈 풍선 게임 단계:</span>
-        <button class="level-btn active" data-level="1">1단계: 자음/모음</button>
-        <button class="level-btn" data-level="2">2단계: 한 글자</button>
-        <button class="level-btn" data-level="3">3단계: 단어</button>
-        <button class="level-btn" data-level="4">4단계: 짧은 글</button>
+    <!-- 하단 자판 및 양옆 손모양 일체형 유닛 (모든 모드에서 항상 표시!) -->
+    <section class="keyboard-with-side-hands-unit" id="keyboardUnit">
+
+      <!-- 1. 왼손 카드 (키보드 좌측) -->
+      <div class="side-hand-card left-side-hand" id="leftHandCard">
+        <span class="hand-tag">왼손 (Left)</span>
+        <div class="svg-wrap" id="leftHandSvgWrap"></div>
       </div>
 
-      <div class="game-canvas-wrapper" id="gameCanvasWrapper">
-        <!-- 풍선 게임 실시간 점수 & 카운터 HUD 오버레이 -->
-        <div class="game-hud-overlay">
-          <div class="hud-item score-hud">⭐ 점수: <span id="gameScore">0</span>점</div>
-          <div class="hud-item pop-hud">🎈 터뜨린 풍선: <span id="gamePopCount">0</span>개</div>
+      <!-- 2. 중앙 유닛: 상단 실시간 안내 가이드 + 대형 가상 키보드 -->
+      <div class="center-keyboard-block">
+        <div class="center-guide-msg" id="fingerGuideMsg">
+          <div class="finger-guide-box">
+            <span class="finger-text">키보드를 누르면 안내 손가락이 움직여요! 👆</span>
+          </div>
         </div>
+
+        <div class="keyboard-section" id="virtualKeyboard" aria-label="타자 키보드 배치"></div>
       </div>
-    </div>
+
+      <!-- 3. 오른손 카드 (키보드 우측) -->
+      <div class="side-hand-card right-side-hand" id="rightHandCard">
+        <span class="hand-tag">오른손 (Right)</span>
+        <div class="svg-wrap" id="rightHandSvgWrap"></div>
+      </div>
+
+    </section>
 
   </main>
 

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'taja-app-v2';
+const CACHE_NAME = 'taja-app-v3';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -8,8 +8,7 @@ const ASSETS_TO_CACHE = [
   './keyboard-data.js',
   './hands.js',
   './manifest.json',
-  './assets/taja_mascot.png',
-  './taja_mascot.png'
+  './assets/taja_mascot.png'
 ];
 
 self.addEventListener('install', (event) => {
