@@ -1,0 +1,18 @@
+{
+  "name": "새싹 타자 교실 - 맞춤 타자 프로그램",
+  "short_name": "새싹타자",
+  "description": "어린이와 지적장애인을 위한 맞춤형 타자 연습 프로그램",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#FFF9F5",
+  "theme_color": "#FF8A5C",
+  "icons": [
+    {
+      "src": "assets/taja_mascot.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

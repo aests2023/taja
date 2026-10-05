@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>새싹 타자 교실 - 어린이를 위한 사이드 손모양 맞춤 타자 프로그램</title>
+  <meta name="description" content="한 화면에 자판과 양옆 손모양이 시원하게 들어오는 어린이/지적장애인 맞춤 타자 프로그램">
+  
+  <!-- PWA 웹앱 설치 지원 설정 -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#FF8A5C">
+  <link rel="apple-touch-icon" href="assets/taja_mascot.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="새싹타자">
+
+  <!-- CSS 스타일시트 -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- 1. 일체형 수평 헤더 (메뉴 글씨 무조건 한 줄 표시) -->
+  <header class="app-header">
+    <div class="brand-section">
+      <img src="assets/taja_mascot.png" alt="타자 요정 곰돌이 마스코트" class="mascot-icon" id="mascotHeroImg">
+      <h1 class="brand-title">새싹 타자 교실 🌱</h1>
+    </div>
+
+    <!-- 학습 모드 네비게이션 탭 (한 줄 유지) -->
+    <nav class="mode-nav" aria-label="학습 모드 선택">
+      <button class="mode-tab active" data-mode="basic" id="tabBasic">1️⃣ 자리 익히기</button>
+      <button class="mode-tab" data-mode="word" id="tabWord">🍎 그림 낱말</button>
+      <button class="mode-tab" data-mode="sentence" id="tabSentence">💬 짧은 글</button>
+      <button class="mode-tab" data-mode="longSentence" id="tabLongSentence">📜 긴 문장</button>
+      <button class="mode-tab" data-mode="balloon" id="tabBalloon">🎈 풍선 게임</button>
+    </nav>
+
+    <!-- 실시간 점수 배지 -->
+    <div class="header-stats">
+      <div class="stat-badge">⭐ <span id="statScore">0</span></div>
+      <div class="stat-badge streak-badge">🔥 <span id="statStreak">0</span></div>
+    </div>
+
+    <!-- 유틸리티 도구 버튼들 (한 줄 유지) -->
+    <div class="header-controls">
+      <button class="tool-btn" id="btnInstallApp" aria-label="앱 설치">📥 앱 설치</button>
+      <button class="tool-btn active" id="btnSoundToggle" aria-label="소리">🔊 소리</button>
+      <button class="tool-btn" id="btnContrastToggle" aria-label="고대비">👁️ 고대비</button>
+      <button class="tool-btn" id="btnFontToggle" aria-label="글자크기">🔍 크게</button>
+      <button class="tool-btn" id="btnStickerAlbum" aria-label="스탬프">🎁 스탬프</button>
+    </div>
+  </header>
+
+  <!-- 2. 메인 콘텐츠 영역 (한 화면에 100% 들어오도록 피팅) -->
+  <main class="main-content">
+
+    <!-- [연습 모드 전용 영역] -->
+    <div id="practiceSection" class="practice-section-allinone">
+
+      <!-- A. 제시 글씨 카드 및 자유 타자 입력창 -->
+      <section class="practice-card-compact">
+        <div class="target-word-wrapper">
+          <span class="target-emoji" id="targetEmoji">🍎</span>
+          <div class="target-text-box">
+            <h2 class="word-display" id="targetWordDisplay">사과</h2>
+            <p class="word-desc" id="targetDesc">새콤달콤 빨간 사과</p>
+          </div>
+        </div>
+
+        <!-- 다음 칠 자소 키 분해 바 (자리/낱말/짧은글 모드 전용) -->
+        <div class="key-decomposition-bar" id="keyDecompositionBar">
+          다음 누를 키: <span class="next-key-tag">ㄱ</span> (왼손 검지)
+        </div>
+      </section>
+
+      <!-- B. 손모양이 키보드 양옆으로 위치하는 사이드 뷰 레이아웃 유닛 -->
+      <section class="keyboard-with-side-hands-unit">
+
+        <!-- 1. 왼손 카드 (키보드 좌측) -->
+        <div class="side-hand-card left-side-hand" id="leftHandCard">
+          <span class="hand-tag">왼손 (Left)</span>
+          <div class="svg-wrap" id="leftHandSvgWrap"></div>
+        </div>
+
+        <!-- 2. 중앙 유닛: 상단 실시간 안내 가이드 + 대형 가상 키보드 -->
+        <div class="center-keyboard-block">
+          <div class="center-guide-msg" id="fingerGuideMsg">
+            <div class="finger-guide-box">
+              <span class="finger-text">키보드를 누르면 안내 손가락이 움직여요! 👆</span>
+            </div>
+          </div>
+
+          <div class="keyboard-section" id="virtualKeyboard" aria-label="타자 키보드 배치"></div>
+        </div>
+
+        <!-- 3. 오른손 카드 (키보드 우측) -->
+        <div class="side-hand-card right-side-hand" id="rightHandCard">
+          <span class="hand-tag">오른손 (Right)</span>
+          <div class="svg-wrap" id="rightHandSvgWrap"></div>
+        </div>
+
+      </section>
+
+      <!-- C. 긴 문장 모드 전용 대형 자유 타자 전용 화면 (자판/손모양 전혀 없음) -->
+      <section class="long-sentence-section" id="longSentenceSection" style="display: none;">
+        
+        <!-- 실시간 지표 헤더 (타수, 정확도, 문장 번호) -->
+        <div class="long-sentence-stats-bar">
+          <div class="stat-pill speed-pill">⚡ 실시간 타수: <strong id="longSpeed">0</strong> 타/분</div>
+          <div class="stat-pill acc-pill">🎯 정확도: <strong id="longAccuracy">100</strong>%</div>
+          <div class="stat-pill progress-pill">📜 연습 문장: <span id="longSentenceNum">1</span> / <span id="longSentenceTotal">7</span></div>
+        </div>
+
+        <!-- 제시 긴 문장 카드 (대형 글씨) -->
+        <div class="long-sentence-card">
+          <span class="long-emoji" id="longTargetEmoji">🌱</span>
+          <div class="long-text-wrapper">
+            <h2 class="long-sentence-display" id="longSentenceDisplay">오늘도 차근차근 즐겁게 타자 연습을 해요.</h2>
+          </div>
+        </div>
+
+        <!-- 크고 시원한 자유 입력 빈칸 (Large Input Box) -->
+        <div class="long-input-wrapper">
+          <input type="text" class="long-typing-input" id="longTypingInput" placeholder="위 문장을 보고 여기에 자유롭게 적어보세요... (엔터를 누르면 다음 문장)" autocomplete="off">
+        </div>
+
+        <!-- 안내 문구 -->
+        <div class="long-guide-tip">
+          <span>💡 문장을 끝까지 적은 후 <strong>[Enter 키]</strong>를 누르면 다음 문장으로 넘어가요!</span>
+        </div>
+
+      </section>
+
+    </div>
+
+    <!-- [풍선 터뜨리기 게임 모드 영역] -->
+    <div id="gameSection" class="game-container">
+      <!-- 풍선 게임 단계 선택 바 -->
+      <div class="game-level-bar" id="balloonLevelNav">
+        <span class="level-label">🎈 풍선 게임 단계:</span>
+        <button class="level-btn active" data-level="1">1단계: 자음/모음</button>
+        <button class="level-btn" data-level="2">2단계: 한 글자</button>
+        <button class="level-btn" data-level="3">3단계: 단어</button>
+        <button class="level-btn" data-level="4">4단계: 짧은 글</button>
+      </div>
+
+      <div class="game-canvas-wrapper" id="gameCanvasWrapper">
+        <!-- 풍선 게임 실시간 점수 & 카운터 HUD 오버레이 -->
+        <div class="game-hud-overlay">
+          <div class="hud-item score-hud">⭐ 점수: <span id="gameScore">0</span>점</div>
+          <div class="hud-item pop-hud">🎈 터뜨린 풍선: <span id="gamePopCount">0</span>개</div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- 3. 칭찬 스탬프 모달 -->
+  <div class="modal-overlay" id="stickerModal" role="dialog" aria-labelledby="modalTitle">
+    <div class="modal-card">
+      <h2 class="modal-title" id="modalTitle">🏆 나의 칭찬 스탬프 앨범</h2>
+      <p style="color: var(--text-muted); font-size: 1.1rem;">연습을 열심히 해서 귀여운 스티커를 모아보세요!</p>
+
+      <div class="sticker-grid" id="stickerGrid"></div>
+
+      <button class="close-btn" id="btnCloseModal">닫기</button>
+    </div>
+  </div>
+
+  <!-- 4. PWA 앱 설치 안내 모달 -->
+  <div class="modal-overlay" id="installGuideModal" role="dialog">
+    <div class="modal-card">
+      <h2 class="modal-title">📲 새싹 타자 교실 설치하기</h2>
+      <div style="text-align: left; font-size: 1.1rem; line-height: 1.6; color: #334155; margin: 1rem 0;">
+        <p><strong>💻 PC (Chrome / Edge):</strong><br>상단 📥 앱 설치 버튼 또는 브라우저 주소창 우측의 📥 아이콘을 누르면 컴퓨터 바탕화면에 바로 설치됩니다.</p>
+        <p style="margin-top: 0.8rem;"><strong>📱 아이폰 / 아이패드 (Safari):</strong><br>하단 공유(⬆️) 버튼을 누른 후 <strong>'홈 화면에 추가'</strong>를 선택하시면 바탕화면에 설치됩니다.</p>
+        <p style="margin-top: 0.8rem;"><strong>🤖 안드로이드 스마트폰 / 태블릿:</strong><br>상단 메뉴(⋮) ➔ <strong>'앱 설치'</strong> 또는 <strong>'홈 화면에 추가'</strong>를 누르세요.</p>
+      </div>
+      <button class="close-btn" id="btnCloseInstallModal">확인</button>
+    </div>
+  </div>
+
+  <!-- 스크립트 로드 순서 -->
+  <script src="keyboard-data.js"></script>
+  <script src="sound.js"></script>
+  <script src="hands.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,1030 @@
+/* ==========================================================================
+   어린이/지적장애인 맞춤 타자 프로그램 디자인 시스템 (styles.css)
+   - 자판(Keyboard) 크기 스크롤 0% 조건 내에서 극대화 (Maximized Keyboard Size)
+   - 사이드 손모양 레이아웃 & 한 줄 메뉴 가이드
+   - 긴 문장 전용 자유 타자 모드 (Free Typing Input & WPM/Accuracy metrics)
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&family=Outfit:wght@400;600;700;800&display=swap');
+
+:root {
+  /* 컬러스키마 (밝고 귀여운 파스텔 & 고대비 Accent) */
+  --bg-main: #FFFDF9;
+  --bg-header: #FFF0E6;
+  --card-bg: #FFFFFF;
+  --card-shadow: 0 4px 16px rgba(255, 140, 66, 0.08);
+  --border-color: #FFE5D4;
+
+  --text-main: #2D3436;
+  --text-muted: #636E72;
+
+  --primary-pink: #FF7675;
+  --primary-orange: #FF8A5C;
+  --primary-yellow: #FDCB6E;
+  --primary-green: #00B894;
+  --primary-blue: #0984E3;
+  --primary-purple: #6C5CE7;
+
+  /* 키보드 및 손가락 색상 */
+  --finger-l-pinky: #FF7675;
+  --finger-l-ring: #FAB1A0;
+  --finger-l-middle: #FFEAA7;
+  --finger-l-index: #55E6C1;
+  --finger-thumb: #A29BFE;
+  --finger-r-index: #74B9FF;
+  --finger-r-middle: #0984E3;
+  --finger-r-ring: #6C5CE7;
+  --finger-r-pinky: #FD79A8;
+
+  --font-title: 'Gowun Dodum', sans-serif;
+  --font-body: 'Gowun Dodum', sans-serif;
+  --font-num: 'Outfit', sans-serif;
+}
+
+/* 고대비 모드 지원 */
+body.high-contrast {
+  --bg-main: #121212;
+  --bg-header: #1E1E1E;
+  --card-bg: #242424;
+  --card-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+  --border-color: #444444;
+  --text-main: #FFFFFF;
+  --text-muted: #CCCCCC;
+}
+
+/* 글자 아주 크게 모드 */
+body.font-xl .word-display {
+  font-size: 3.2rem !important;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  height: 100vh;
+  max-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* 스크롤 전혀 없음 */
+  line-height: 1.3;
+}
+
+/* ==========================================
+   1. 컴팩트 통합 수평 헤더 (메뉴 무조건 한 줄)
+   ========================================== */
+.app-header {
+  background: linear-gradient(135deg, #FFF5EC 0%, #FFEBE0 100%);
+  border-bottom: 2px solid #FFD8C2;
+  padding: 0.25rem 0.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  box-shadow: 0 2px 6px rgba(255, 138, 92, 0.06);
+  flex-shrink: 0;
+}
+
+.brand-section {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  white-space: nowrap;
+}
+
+.mascot-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1.5px solid #FFF;
+  box-shadow: 0 2px 6px rgba(255, 122, 0, 0.2);
+}
+
+.brand-title {
+  font-family: var(--font-title);
+  font-size: 1.35rem;
+  color: #E85A2A;
+  text-shadow: 1px 1px 0px #FFF, 2px 2px 0px #FFD5C2;
+  white-space: nowrap;
+}
+
+/* 학습 모드 네비게이션 탭 (줄바꿈 절대 금지!) */
+.mode-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.mode-tab {
+  background: var(--card-bg);
+  border: 1.5px solid #FFE0CF;
+  padding: 0.25rem 0.65rem;
+  border-radius: 14px;
+  font-family: var(--font-title);
+  font-size: 0.92rem;
+  color: #555;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  white-space: nowrap;
+}
+
+.mode-tab:hover {
+  border-color: var(--primary-orange);
+  color: var(--primary-orange);
+}
+
+.mode-tab.active {
+  background: linear-gradient(135deg, #FF8A5C 0%, #FF6B4A 100%);
+  color: #FFFFFF;
+  border-color: #FF5533;
+  box-shadow: 0 3px 8px rgba(255, 107, 74, 0.25);
+}
+
+/* 점수 배지 */
+.header-stats {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.stat-badge {
+  background: var(--card-bg);
+  border: 1.5px solid #FFD0B8;
+  padding: 0.2rem 0.55rem;
+  border-radius: 14px;
+  font-family: var(--font-title);
+  font-size: 0.95rem;
+  color: var(--primary-orange);
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  white-space: nowrap;
+}
+
+.stat-badge span {
+  font-family: var(--font-num);
+  font-size: 1.15rem;
+  font-weight: 800;
+}
+
+/* 도구 버튼 */
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.tool-btn {
+  background: var(--card-bg);
+  border: 1.5px solid var(--border-color);
+  padding: 0.25rem 0.55rem;
+  border-radius: 14px;
+  font-family: var(--font-title);
+  font-size: 0.88rem;
+  color: var(--text-main);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.tool-btn:hover {
+  border-color: var(--primary-orange);
+  color: var(--primary-orange);
+}
+
+.tool-btn.active {
+  background: var(--primary-orange);
+  color: #FFF;
+  border-color: var(--primary-orange);
+}
+
+/* ==========================================
+   2. 메인 피팅 컨테이너
+   ========================================== */
+.main-content {
+  flex: 1;
+  max-width: 1400px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0.3rem 0.6rem 0.5rem 0.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  overflow: hidden;
+}
+
+/* ==========================================
+   3. 연습 모드 일체형 레이아웃
+   ========================================== */
+.practice-section-allinone {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 0.3rem;
+  overflow: hidden;
+}
+
+/* 글씨 연습 제시 카드 */
+.practice-card-compact {
+  background: var(--card-bg);
+  border: 2px solid var(--border-color);
+  border-radius: 16px;
+  padding: 0.35rem 1.2rem;
+  box-shadow: var(--card-shadow);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+.target-word-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.target-emoji {
+  font-size: 2.3rem;
+  line-height: 1;
+}
+
+.target-text-box {
+  display: flex;
+  align-items: baseline;
+  gap: 0.8rem;
+}
+
+.word-display {
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 2.5rem;
+  letter-spacing: 0.05em;
+  color: var(--text-main);
+  line-height: 1.4;
+}
+
+.word-char {
+  display: inline-block;
+  padding: 0 1.5px;
+  letter-spacing: 0.04em;
+}
+
+.word-char.space-char {
+  display: inline-block;
+  width: 0.42em;
+  margin: 0 0.05em;
+  white-space: pre;
+}
+
+.word-char.completed {
+  color: #00B894;
+}
+
+.word-char.current {
+  color: var(--primary-orange);
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.word-char.incorrect {
+  color: #E74C3C;
+  background-color: transparent;
+  text-decoration: none;
+}
+
+.word-desc {
+  font-size: 1rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+/* 긴 문장 모드 전용 자유 타자 모드 */
+.free-typing-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex: 1;
+  margin-left: 1.5rem;
+}
+
+.free-typing-input {
+  flex: 1;
+  background: #FFFDF9;
+  border: 2.5px solid var(--primary-orange);
+  border-radius: 14px;
+  padding: 0.35rem 0.9rem;
+  font-family: var(--font-title);
+  font-size: 1.3rem;
+  color: var(--text-main);
+  outline: none;
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.04);
+}
+
+.free-typing-input:focus {
+  border-color: #FF5533;
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.04), 0 0 10px rgba(255, 107, 74, 0.3);
+}
+
+.free-typing-stats {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  white-space: nowrap;
+}
+
+.speed-badge, .acc-badge {
+  background: #FFF5EE;
+  border: 1.5px solid #FFD0B8;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-family: var(--font-title);
+  font-size: 1rem;
+  color: var(--text-main);
+}
+
+.speed-badge strong, .acc-badge strong {
+  font-family: var(--font-num);
+  color: var(--primary-orange);
+  font-size: 1.2rem;
+}
+
+/* 다음 칠 자소 분해 바 */
+.key-decomposition-bar {
+  background: #FFF5EE;
+  border: 1.5px dashed #FFB899;
+  border-radius: 12px;
+  padding: 0.25rem 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.next-key-tag {
+  background: var(--primary-orange);
+  color: #FFF;
+  padding: 0.15rem 0.75rem;
+  border-radius: 10px;
+  font-family: var(--font-title);
+  font-size: 1.25rem;
+  box-shadow: 0 2px 6px rgba(255, 138, 92, 0.25);
+}
+
+/* ==========================================
+   4. 손모양이 키보드 양옆에 위치하는 사이드 뷰 유닛
+   ========================================== */
+.keyboard-with-side-hands-unit {
+  flex: 1;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: 0.6rem;
+  width: 100%;
+  overflow: hidden;
+}
+
+.side-hand-card {
+  width: 150px;
+  background: #FFF8F3;
+  border: 2.5px solid #FFE0CF;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.3rem;
+  box-shadow: var(--card-shadow);
+  transition: all 0.25s ease;
+  flex-shrink: 0;
+}
+
+.side-hand-card.active-hand {
+  border-color: var(--primary-orange);
+  background: #FFF0E6;
+  box-shadow: 0 0 14px rgba(255, 138, 92, 0.3);
+}
+
+.hand-tag {
+  background: #FFF0E6;
+  color: #E85A2A;
+  padding: 0.2rem 0.65rem;
+  border-radius: 10px;
+  font-family: var(--font-title);
+  font-size: 0.95rem;
+  border: 1.5px solid #FFD5C2;
+  white-space: nowrap;
+}
+
+.svg-wrap {
+  width: 100%;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hand-svg-mini {
+  width: 100%;
+  height: 100%;
+  max-height: 220px;
+}
+
+.center-keyboard-block {
+  flex: 1;
+  max-width: 1080px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 0.3rem;
+  height: 100%;
+}
+
+.center-guide-msg {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.finger-guide-box {
+  background: #FFFFFF;
+  border: 2.5px solid var(--border-color);
+  border-left: 7px solid var(--primary-orange);
+  border-radius: 14px;
+  padding: 0.3rem 1rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.finger-dot {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.target-key-badge {
+  background: #FFE8D6;
+  color: #E85A2A;
+  padding: 0.05rem 0.45rem;
+  border-radius: 6px;
+  font-size: 1.15rem;
+}
+
+.finger-group.active-finger {
+  filter: drop-shadow(0px 0px 8px rgba(255, 107, 74, 0.9));
+  animation: pulseFinger 0.7s infinite alternate ease-in-out;
+}
+
+@keyframes pulseFinger {
+  0% { transform: translateY(0px) scale(1); }
+  100% { transform: translateY(-5px) scale(1.08); }
+}
+
+/* ==========================================
+   5. 대형 가상 키보드
+   ========================================== */
+.keyboard-section {
+  background: #FFFFFF;
+  border: 3px solid #FFE0CF;
+  border-radius: 20px;
+  padding: 0.5rem 0.6rem;
+  width: 100%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.03);
+}
+
+.kb-row {
+  display: flex;
+  gap: 0.35rem;
+  justify-content: center;
+  width: 100%;
+}
+
+.key-cap {
+  background: #FFFFFF;
+  border: 2px solid #CBD5E1;
+  border-bottom: 4.5px solid #94A3B8;
+  border-radius: 13px;
+  width: clamp(46px, 5.4vw, 66px);
+  height: clamp(44px, 7.2vh, 62px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-title);
+  position: relative;
+  transition: all 0.12s ease;
+  padding: 2px 0;
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  cursor: pointer;
+}
+
+.key-cap .key-hangul {
+  font-size: clamp(1.15rem, 3.2vh, 1.65rem);
+  color: var(--text-main);
+  line-height: 1;
+  font-weight: 800;
+}
+
+.key-cap .key-eng {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  font-family: var(--font-num);
+  margin-top: 1px;
+}
+
+.key-cap::before {
+  display: none;
+}
+
+.key-cap.target-key {
+  border-color: var(--primary-orange) !important;
+  border-top-color: #E85A2A !important;
+  border-bottom-color: #E85A2A !important;
+  background: #FFF0E6 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(255, 138, 92, 0.45);
+  animation: keyGlow 0.8s infinite alternate;
+}
+
+@keyframes keyGlow {
+  from { box-shadow: 0 0 6px rgba(255, 138, 92, 0.4); }
+  to { box-shadow: 0 0 18px rgba(255, 138, 92, 0.8); }
+}
+
+.key-cap.pressed {
+  transform: translateY(2px) !important;
+  border-bottom-width: 2px !important;
+  background: #FFEBE0 !important;
+}
+
+.key-cap.space-key {
+  width: clamp(240px, 28vw, 340px);
+}
+
+.key-cap.shift-key {
+  width: clamp(54px, 6.2vw, 82px);
+  background: #F8FAFC;
+}
+
+.key-cap.shift-key .key-hangul {
+  font-size: clamp(0.95rem, 2.5vh, 1.25rem);
+  color: #475569;
+}
+
+.key-cap.enter-key {
+  width: clamp(64px, 7.2vw, 92px);
+  background: #F8FAFC;
+}
+
+.key-cap.enter-key .key-hangul {
+  font-size: clamp(0.95rem, 2.5vh, 1.25rem);
+  color: #475569;
+}
+
+.key-cap.shift-active .key-eng {
+  color: var(--primary-orange);
+  font-weight: 800;
+  font-size: 0.85rem;
+}
+
+.key-cap.shift-active .key-hangul {
+  opacity: 0.6;
+}
+
+/* ==========================================
+   6. 단계별 풍선 터뜨리기 게임 모드 & HUD
+   ========================================== */
+.game-container {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+.game-level-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--card-bg);
+  border: 2px solid var(--border-color);
+  padding: 0.3rem 1rem;
+  border-radius: 16px;
+  box-shadow: var(--card-shadow);
+  width: 100%;
+  max-width: 1080px;
+  margin-bottom: 0.3rem;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.level-label {
+  font-family: var(--font-title);
+  font-size: 1.05rem;
+  color: #E85A2A;
+  white-space: nowrap;
+}
+
+.level-btn {
+  background: #FFF;
+  border: 1.5px solid #FFE0CF;
+  padding: 0.25rem 0.8rem;
+  border-radius: 14px;
+  font-family: var(--font-title);
+  font-size: 0.95rem;
+  color: #555;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.level-btn:hover {
+  border-color: var(--primary-orange);
+  color: var(--primary-orange);
+}
+
+.level-btn.active {
+  background: linear-gradient(135deg, #FF8A5C 0%, #FF6B4A 100%);
+  color: #FFF;
+  border-color: #FF5533;
+  box-shadow: 0 3px 8px rgba(255, 107, 74, 0.25);
+}
+
+.game-canvas-wrapper {
+  background: linear-gradient(180deg, #E0F7FA 0%, #FFF9C4 100%);
+  border: 3px solid #80DEEA;
+  border-radius: 22px;
+  width: 100%;
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--card-shadow);
+}
+
+.game-hud-overlay {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.hud-item {
+  background: rgba(255, 255, 255, 0.92);
+  border: 2px solid var(--border-color);
+  backdrop-filter: blur(4px);
+  padding: 0.35rem 0.95rem;
+  border-radius: 18px;
+  font-family: var(--font-title);
+  font-size: 1.1rem;
+  color: var(--text-main);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.hud-item span {
+  font-family: var(--font-num);
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--primary-orange);
+}
+
+.game-balloon {
+  position: absolute;
+  padding: 0.8rem 1.2rem;
+  min-width: 80px;
+  min-height: 95px;
+  border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-title);
+  font-size: 1.6rem;
+  color: #FFF;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+  box-shadow: inset -6px -6px 14px rgba(0,0,0,0.15), 0 5px 12px rgba(0,0,0,0.1);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.game-balloon .typed-char {
+  color: #FFEAA7;
+  font-weight: 800;
+  text-shadow: 0 0 10px rgba(255, 234, 167, 0.95), 1px 1px 2px rgba(0,0,0,0.4);
+}
+
+/* ==========================================
+   7. 스티커 / 칭찬 모달 영역
+   ========================================== */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.modal-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal-card {
+  background: var(--card-bg);
+  border: 4px solid var(--border-color);
+  border-radius: 28px;
+  padding: 1.8rem;
+  max-width: 580px;
+  width: 90%;
+  box-shadow: 0 16px 40px rgba(0,0,0,0.25);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  transform: scale(0.8);
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.modal-overlay.active .modal-card {
+  transform: scale(1);
+}
+
+.modal-title {
+  font-family: var(--font-title);
+  font-size: 2rem;
+  color: var(--primary-orange);
+}
+
+.sticker-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.8rem;
+  width: 100%;
+}
+
+.sticker-item {
+  background: #FFF5EE;
+  border: 2px dashed #FFCDB2;
+  border-radius: 16px;
+  padding: 0.7rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  text-align: center;
+  opacity: 0.4;
+  filter: grayscale(1);
+}
+
+.sticker-item.unlocked {
+  opacity: 1;
+  filter: grayscale(0);
+  border: 2px solid #FF8A5C;
+  background: #FFF;
+  box-shadow: 0 4px 10px rgba(255, 138, 92, 0.2);
+}
+
+.sticker-emoji { font-size: 2rem; }
+.sticker-name { font-family: var(--font-title); font-size: 0.9rem; }
+
+.close-btn {
+  background: var(--primary-orange);
+  color: #FFF;
+  border: none;
+  padding: 0.6rem 2rem;
+  border-radius: 18px;
+  font-family: var(--font-title);
+  font-size: 1.15rem;
+  cursor: pointer;
+}
+
+/* ==========================================
+   8. 긴 문장 모드 전용 대형 자유 타자 스타일 (No Keyboard & No Hands)
+   ========================================== */
+.long-sentence-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.2rem;
+  background: #FFFFFF;
+  border: 3px solid #FFE0CF;
+  border-radius: 24px;
+  padding: 1.5rem 2rem;
+  box-shadow: var(--card-shadow);
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  overflow: hidden;
+}
+
+.long-sentence-stats-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.stat-pill {
+  background: #FFF5EE;
+  border: 2px solid #FFD0B8;
+  padding: 0.45rem 1.4rem;
+  border-radius: 18px;
+  font-family: var(--font-title);
+  font-size: 1.2rem;
+  color: var(--text-main);
+  box-shadow: 0 3px 8px rgba(255, 138, 92, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.stat-pill strong, .stat-pill span {
+  font-family: var(--font-num);
+  font-size: 1.45rem;
+  color: var(--primary-orange);
+  font-weight: 800;
+}
+
+.long-sentence-card {
+  width: 100%;
+  background: linear-gradient(135deg, #FFF9F5 0%, #FFF2EC 100%);
+  border: 2.5px solid #FFD5C2;
+  border-radius: 20px;
+  padding: 1.5rem 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  box-shadow: inset 0 2px 6px rgba(255, 255, 255, 0.8), 0 4px 14px rgba(255, 138, 92, 0.08);
+}
+
+.long-emoji {
+  font-size: 3.5rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.long-text-wrapper {
+  flex: 1;
+}
+
+.long-sentence-display {
+  font-family: var(--font-title);
+  font-size: 2.3rem;
+  letter-spacing: 1px;
+  line-height: 1.4;
+  color: var(--text-main);
+  word-break: keep-all;
+}
+
+.long-input-wrapper {
+  width: 100%;
+}
+
+.long-typing-input {
+  width: 100%;
+  background: #FFFFFF;
+  border: 3.5px solid var(--primary-orange);
+  border-radius: 20px;
+  padding: 1rem 1.5rem;
+  font-family: var(--font-title);
+  font-size: 2rem;
+  color: var(--text-main);
+  outline: none;
+  box-shadow: 0 6px 18px rgba(255, 138, 92, 0.15), inset 0 2px 5px rgba(0,0,0,0.03);
+  transition: all 0.2s ease;
+}
+
+.long-typing-input:focus {
+  border-color: #FF5533;
+  box-shadow: 0 8px 24px rgba(255, 107, 74, 0.3), inset 0 2px 5px rgba(0,0,0,0.03);
+  transform: translateY(-2px);
+}
+
+.long-guide-tip {
+  background: #FFF0E6;
+  border: 1.5px solid #FFD5C2;
+  border-radius: 14px;
+  padding: 0.5rem 1.4rem;
+  font-family: var(--font-body);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #E85A2A;
+}
+
+/* ==========================================
+   8. 스마트폰 / 모바일 반응형 최적화
+   ========================================== */
+@media (max-width: 768px) {
+  .app-header {
+    padding: 0.3rem 0.5rem;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+  }
+
+  .brand-title {
+    font-size: 1.1rem;
+  }
+
+  .mode-tab {
+    padding: 0.35rem 0.6rem;
+    font-size: 0.85rem;
+  }
+
+  .kb-row {
+    gap: 2px;
+  }
+
+  .key-cap {
+    width: clamp(25px, 7.2vw, 44px);
+    height: clamp(38px, 6.5vh, 52px);
+    border-radius: 8px;
+    padding: 1px 0;
+  }
+
+  .key-cap .key-hangul {
+    font-size: clamp(0.9rem, 2.8vw, 1.2rem);
+  }
+
+  .key-cap .key-eng {
+    font-size: 0.55rem;
+  }
+
+  .key-cap.space-key {
+    width: clamp(140px, 45vw, 220px);
+  }
+
+  .key-cap.shift-key, .key-cap.enter-key {
+    width: clamp(36px, 11vw, 54px);
+  }
+
+  .hand-guide-side {
+    width: 32px;
+    min-width: 32px;
+  }
+
+  .target-word-display {
+    font-size: clamp(1.8rem, 6vw, 2.5rem);
+  }
+}
+
+@media (max-width: 480px) {
+  .key-cap {
+    width: clamp(22px, 7.5vw, 32px);
+    height: clamp(36px, 6vh, 46px);
+  }
+
+  .key-cap .key-hangul {
+    font-size: 0.85rem;
+  }
+
+  .hand-guide-side {
+    display: none;
+  }
+}
