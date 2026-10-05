@@ -7,8 +7,8 @@
 class SoundSystem {
   constructor() {
     this.audioCtx = null;
-    this.soundEnabled = true;
-    this.speechEnabled = true;
+    this.soundEnabled = true;  // 효과음 온 (기본 켜짐)
+    this.speechEnabled = false; // 음성 읽기(TTS) 오프 (소리는 효과음만 내고 글은 읽지 않음)
     this.speechRate = 0.95; // 가장 자연스럽고 온화한 대화 속도
     this.speechPitch = 1.0;  // 기계음 왜곡 없는 사람 고유 피치
     this.koreanVoice = null;

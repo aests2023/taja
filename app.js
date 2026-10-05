@@ -23,7 +23,8 @@ class TajaApp {
     this.totalTyped = 0;
     
     // 설정 옵션
-    this.speechEnabled = true;
+    this.soundEnabled = true;
+    this.speechEnabled = false; // 소리는 효과음만 내고 글은 읽지 않음
     this.highContrast = false;
     this.largeFont = false;
     this.isShiftPressed = false;
@@ -36,12 +37,12 @@ class TajaApp {
   }
 
   init() {
-    // PWA 서비스 워커 등록
-    if ('serviceWorker' in navigator) {
+    // PWA 서비스 워커 등록 (http/https 환경에서만 동작)
+    if ('serviceWorker' in navigator && location.protocol !== 'file:') {
       navigator.serviceWorker.register('./sw.js').catch((err) => console.log('SW reg error:', err));
     }
 
-    // PWA 설치 이벤트 수신
+    // PWA 설치 이벤트 수신 및 버튼 활성화 상태 동기화
     this.deferredPrompt = window.deferredPwaPrompt || null;
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
@@ -220,17 +221,35 @@ class TajaApp {
       });
     });
 
-    // 헤더 유틸리티 버튼들
+    // 헤더 유틸리티 버튼들 (효과음 & 음성읽기 딜 분리)
     const soundToggle = document.getElementById('btnSoundToggle');
     if (soundToggle) {
+      soundToggle.classList.toggle('active', this.soundEnabled);
+      soundToggle.innerHTML = this.soundEnabled ? '🔔 효과음' : '🔕 효과음 끔';
+      
       soundToggle.addEventListener('click', () => {
+        this.soundEnabled = !this.soundEnabled;
+        window.soundSystem.soundEnabled = this.soundEnabled;
+        soundToggle.classList.toggle('active', this.soundEnabled);
+        soundToggle.innerHTML = this.soundEnabled ? '🔔 효과음' : '🔕 효과음 끔';
+        if (this.soundEnabled) {
+          window.soundSystem.playKeyPop();
+        }
+      });
+    }
+
+    const speechToggle = document.getElementById('btnSpeechToggle');
+    if (speechToggle) {
+      speechToggle.classList.toggle('active', this.speechEnabled);
+      speechToggle.innerHTML = this.speechEnabled ? '🗣️ 음성읽기' : '🔇 음성 끔';
+
+      speechToggle.addEventListener('click', () => {
         this.speechEnabled = !this.speechEnabled;
         window.soundSystem.speechEnabled = this.speechEnabled;
-        window.soundSystem.soundEnabled = this.speechEnabled;
-        soundToggle.classList.toggle('active', this.speechEnabled);
-        soundToggle.innerHTML = this.speechEnabled ? '🔊 소리' : '🔇 소리 끔';
-        if (this.speechEnabled) {
-          window.soundSystem.speak('소리를 켰어요');
+        speechToggle.classList.toggle('active', this.speechEnabled);
+        speechToggle.innerHTML = this.speechEnabled ? '🗣️ 음성읽기' : '🔇 음성 끔';
+        if (!this.speechEnabled && 'speechSynthesis' in window) {
+          window.speechSynthesis.cancel();
         }
       });
     }
@@ -256,19 +275,39 @@ class TajaApp {
     // PWA 앱 설치 버튼 및 모달
     const btnInstall = document.getElementById('btnInstallApp');
     if (btnInstall) {
-      btnInstall.addEventListener('click', () => {
+      if (window.deferredPwaPrompt || this.deferredPrompt) {
+        btnInstall.classList.add('active');
+      }
+
+      window.addEventListener('pwa-prompt-ready', () => {
+        btnInstall.classList.add('active');
+      });
+
+      window.addEventListener('appinstalled', () => {
+        this.deferredPrompt = null;
+        window.deferredPwaPrompt = null;
+        btnInstall.classList.remove('active');
+        btnInstall.innerHTML = '✅ 설치됨';
+      });
+
+      btnInstall.addEventListener('click', async () => {
         const promptEvent = this.deferredPrompt || window.deferredPwaPrompt;
         if (promptEvent) {
-          promptEvent.prompt();
-          promptEvent.userChoice.then((choiceResult) => {
+          try {
+            promptEvent.prompt();
+            const choiceResult = await promptEvent.userChoice;
             if (choiceResult.outcome === 'accepted') {
               this.deferredPrompt = null;
               window.deferredPwaPrompt = null;
+              btnInstall.classList.remove('active');
+              btnInstall.innerHTML = '✅ 설치됨';
             }
-          });
+          } catch (err) {
+            console.error('Install prompt error:', err);
+            this.openInstallModal();
+          }
         } else {
-          const installModal = document.getElementById('installGuideModal');
-          if (installModal) installModal.classList.add('active');
+          this.openInstallModal();
         }
       });
     }

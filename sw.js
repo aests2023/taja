@@ -1,4 +1,4 @@
-const CACHE_NAME = 'taja-app-v3';
+const CACHE_NAME = 'taja-app-v4';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -16,7 +16,7 @@ self.addEventListener('install', (event) => {
     caches.open(CACHE_NAME).then((cache) => {
       return Promise.all(
         ASSETS_TO_CACHE.map((url) => 
-          cache.add(url).catch((err) => console.log('Asset cache skipped:', url))
+          cache.add(url).catch((err) => console.log('Asset cache skipped:', url, err))
         )
       );
     })
@@ -36,9 +36,12 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
+  if (event.request.method !== 'GET' || !event.request.url.startsWith('http')) return;
+
   event.respondWith(
     caches.match(event.request).then((response) => {
       return response || fetch(event.request).catch(() => caches.match('./index.html'));
     })
   );
 });
+

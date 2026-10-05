@@ -7,6 +7,14 @@
   <meta name="description" content="한 화면에 자판과 양옆 손모양이 시원하게 들어오는 어린이/지적장애인 맞춤 타자 프로그램">
   
   <!-- PWA 웹앱 설치 지원 설정 -->
+  <script>
+    window.deferredPwaPrompt = null;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      window.deferredPwaPrompt = e;
+      window.dispatchEvent(new CustomEvent('pwa-prompt-ready'));
+    });
+  </script>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#FF8A5C">
   <link rel="apple-touch-icon" href="assets/taja_mascot.png">
@@ -44,7 +52,8 @@
     <!-- 유틸리티 도구 버튼들 (한 줄 유지) -->
     <div class="header-controls">
       <button class="tool-btn" id="btnInstallApp" aria-label="앱 설치">📥 앱 설치</button>
-      <button class="tool-btn active" id="btnSoundToggle" aria-label="소리">🔊 소리</button>
+      <button class="tool-btn active" id="btnSoundToggle" aria-label="효과음">🔔 효과음</button>
+      <button class="tool-btn" id="btnSpeechToggle" aria-label="음성읽기">🗣️ 음성 끔</button>
       <button class="tool-btn" id="btnContrastToggle" aria-label="고대비">👁️ 고대비</button>
       <button class="tool-btn" id="btnFontToggle" aria-label="글자크기">🔍 크게</button>
       <button class="tool-btn" id="btnStickerAlbum" aria-label="스탬프">🎁 스탬프</button>
@@ -164,13 +173,44 @@
 
   <!-- 4. PWA 앱 설치 안내 모달 -->
   <div class="modal-overlay" id="installGuideModal" role="dialog">
-    <div class="modal-card">
-      <h2 class="modal-title">📲 새싹 타자 교실 설치하기</h2>
-      <div style="text-align: left; font-size: 1.1rem; line-height: 1.6; color: #334155; margin: 1rem 0;">
-        <p><strong>💻 PC (Chrome / Edge):</strong><br>상단 📥 앱 설치 버튼 또는 브라우저 주소창 우측의 📥 아이콘을 누르면 컴퓨터 바탕화면에 바로 설치됩니다.</p>
-        <p style="margin-top: 0.8rem;"><strong>📱 아이폰 / 아이패드 (Safari):</strong><br>하단 공유(⬆️) 버튼을 누른 후 <strong>'홈 화면에 추가'</strong>를 선택하시면 바탕화면에 설치됩니다.</p>
-        <p style="margin-top: 0.8rem;"><strong>🤖 안드로이드 스마트폰 / 태블릿:</strong><br>상단 메뉴(⋮) ➔ <strong>'앱 설치'</strong> 또는 <strong>'홈 화면에 추가'</strong>를 누르세요.</p>
+    <div class="modal-card install-modal-card">
+      <h2 class="modal-title">📲 새싹 타자 교실 앱 설치/다운로드</h2>
+      
+      <div id="fileProtocolNotice" class="protocol-notice" style="display: none; background: #FFF3CD; color: #856404; padding: 0.9rem 1.1rem; border-radius: 14px; border: 1.5px solid #FFEBAA; font-size: 0.95rem; line-height: 1.5; width: 100%; text-align: left;">
+        💡 <strong>로컬 파일(file://) 실행 안내:</strong> 탐색기에서 파일을 직접 연 경우 브라우저 보안 규칙으로 인해 원클릭 PWA 자동 설치가 제한됩니다.<br>아래 방법 중 하나로 설치해 보세요!
       </div>
+
+      <div class="install-guide-grid">
+        <div class="guide-box">
+          <div class="guide-box-title">💻 PC (Chrome / Edge / Whale)</div>
+          <div class="guide-box-body">
+            <p><strong>1) 웹/서버 접속 시:</strong> 상단 <strong>📥 앱 설치</strong> 버튼 또는 주소창 우측의 <strong>📥 아이콘</strong>을 클릭하세요.</p>
+            <p style="margin-top: 6px;"><strong>2) 파일 바로 열었을 때:</strong> 브라우저 우상단 메뉴(⋮) ➔ <strong>'도구 더보기'</strong> ➔ <strong>'바로가기 만들기...'</strong> (앱으로 열기 체크)를 누르면 바탕화면 앱으로 생성됩니다.</p>
+          </div>
+        </div>
+
+        <div class="guide-box">
+          <div class="guide-box-title">📱 아이폰 / 아이패드 (Safari)</div>
+          <div class="guide-box-body">
+            <p>하단 <strong>공유 버튼(⬆️)</strong>을 누른 후 <strong>'홈 화면에 추가 (+)'</strong>를 선택하면 바탕화면에 설치됩니다.</p>
+          </div>
+        </div>
+
+        <div class="guide-box">
+          <div class="guide-box-title">🤖 안드로이드 (Chrome / 삼성 인터넷)</div>
+          <div class="guide-box-body">
+            <p>상단 메뉴(⋮) ➔ <strong>'앱 설치'</strong> 또는 <strong>'홈 화면에 추가'</strong>를 누르세요.</p>
+          </div>
+        </div>
+
+        <div class="guide-box dev-guide-box">
+          <div class="guide-box-title">🚀 웹 서버로 실행하기 (개발/PWA 지원)</div>
+          <div class="guide-box-body">
+            <p>터미널에서 <code>npm start</code> 실행 후 <code>http://localhost:8080</code> 으로 접속하시면 원클릭 PWA 설치가 100% 동작합니다.</p>
+          </div>
+        </div>
+      </div>
+
       <button class="close-btn" id="btnCloseInstallModal">확인</button>
     </div>
   </div>
